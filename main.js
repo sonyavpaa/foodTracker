@@ -12,31 +12,30 @@ const selectFoodType = document.querySelector("select");
 const foodItemsContainer = document.querySelector(".foodItems__container");
 const totalCalories = document.querySelector(".caloriesLogged");
 let foodItemDivs = document.querySelectorAll(".foodItem");
+const deleteFoodItems = document.querySelector("#foodItemLogs");
+const deleteButton = document.querySelector(".deleteButton");
 // automated default numb for chart to keep it same sized
 const automatedNum = 20;
-// array foor all foodItems, will be updated in API.get request
-const foodArray = [];
 
 const API = new FetchWrapper(
   "https://firestore.googleapis.com/v1/projects/programmingjs-90a13/databases/(default)/documents/"
 );
 
 // Submitting new foodItem
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = selectFoodType.value;
   const carbs = parseInt(inputCarbs.value);
   const protein = parseInt(inputProtein.value);
   const fat = parseInt(inputFat.value);
 
-  addAPI(name, carbs, protein, fat);
+  await addAPI(name, carbs, protein, fat);
   form.reset();
-  snackbar.show("New food info added!");
 });
 
 // Adding new food item to API
-function addAPI(nameValue, carbsValue, proteinValue, fatValue) {
-  API.post("foodtracker2022", {
+async function addAPI(nameValue, carbsValue, proteinValue, fatValue) {
+  await API.post("foodtracker2022", {
     name,
     fields: {
       name: {
@@ -55,50 +54,55 @@ function addAPI(nameValue, carbsValue, proteinValue, fatValue) {
   }).then((data) => {
     console.log(data);
   });
+  window.location.reload();
 }
-
-// API.delete("foodtracker2022/Ne88pET4c5nlztx61trU").then((data) =>
-//   console.log(data)
-// );
 
 // getting the API and creating html content
 API.get("foodtracker2022").then((data) => {
   let totalCaloriesCalc = 0;
+  if (data?.documents) {
+    data?.documents.forEach((item) => {
+      const nameUrl = item?.name.split("/")[6];
 
-  data?.documents.forEach((item) => {
-    foodArray.push(item);
-    const carbs = parseInt(item?.fields?.carbs?.integerValue);
-    const protein = parseInt(item?.fields?.protein?.integerValue);
-    const fat = parseInt(item?.fields?.fat?.integerValue);
-    totalCaloriesCalc += caloriesCalc(carbs, protein, fat);
+      const name = item?.fields?.name?.stringValue;
+      const carbs = parseInt(item?.fields?.carbs?.integerValue);
+      const protein = parseInt(item?.fields?.protein?.integerValue);
+      const fat = parseInt(item?.fields?.fat?.integerValue);
+      totalCaloriesCalc += caloriesCalc(carbs, protein, fat);
 
-    foodItemsContainer.innerHTML += `<div class="foodItem">
-    <h2>${item?.fields?.name?.stringValue}</h2>
-    <p>calories ${caloriesCalc(carbs, protein, fat)}</p>
+      foodItemsContainer.innerHTML += `<div class="foodItem">
+    <h2>${name}</h2>
+    <p>Calories ${caloriesCalc(carbs, protein, fat)}</p>
     <ul class="foodItemNutritionList">
       <li class="foodItemCarbs">Carbs ${carbs}</li>
       <li class="foodItemProtein">Protein ${protein}</li>
       <li class="foodItemFat">Fat ${fat}</li>
     </ul>
   </div>`;
-  });
+
+      deleteFoodItems.innerHTML += `<option value="${nameUrl}">${name}</option>`;
+    });
+  }
 
   totalCalories.textContent = totalCaloriesCalc;
 
   //   setting the latest one into chart
-  const charCarbs = parseInt(
-    data?.documents[data?.documents.length - 1]?.fields?.carbs?.integerValue
-  );
-  const charProtein = parseInt(
-    data?.documents[data?.documents.length - 1]?.fields?.protein?.integerValue
-  );
-  const charFat = parseInt(
-    data?.documents[data?.documents.length - 1]?.fields?.fat?.integerValue
-  );
-  doChart.config.data.datasets[0].data[0] = charCarbs;
-  doChart.config.data.datasets[0].data[1] = charProtein;
-  doChart.config.data.datasets[0].data[2] = charFat;
-  doChart.update();
+  if (data?.documents) {
+    const charCarbs = parseInt(
+      data?.documents[data?.documents.length - 1]?.fields?.carbs?.integerValue
+    );
+    const charProtein = parseInt(
+      data?.documents[data?.documents.length - 1]?.fields?.protein?.integerValue
+    );
+    const charFat = parseInt(
+      data?.documents[data?.documents.length - 1]?.fields?.fat?.integerValue
+    );
+    doChart.config.data.datasets[0].data[0] = charCarbs;
+    doChart.config.data.datasets[0].data[1] = charProtein;
+    doChart.config.data.datasets[0].data[2] = charFat;
+    doChart.config.data.datasets[0].data[3] = automatedNum;
+    doChart.update();
+  }
 
   //   adding event listeners to foodItems in DOM
   foodItemDivs = document.querySelectorAll(".foodItem").forEach((item) =>
@@ -173,3 +177,13 @@ const config = {
 };
 
 const doChart = new Chart(document.querySelector("#doChart"), config);
+
+// delete
+deleteButton.addEventListener("click", async (e) => {
+  console.log(deleteFoodItems.value);
+
+  await API.delete(`foodtracker2022/${deleteFoodItems.value}`).then((data) =>
+    console.log(data)
+  );
+  window.location.reload();
+});

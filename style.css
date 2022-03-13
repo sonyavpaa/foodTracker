@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+:root {
+  --ff__head01: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --ff__bread01: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -17,23 +23,35 @@ section {
   border: 1px solid red;
 }
 
+h1,
 h2 {
   margin: 0.5em 0;
+  font-family: var(--ff__head01);
+}
+
+p,
+ul,
+li,
+button {
+  font-family: var(--ff__bread01);
 }
 
 .foodTypes__container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  font-family: var(--ff__bread01);
 }
 
 select {
   width: 60%;
+  font-family: var(--ff__bread01);
 }
 
 form {
   display: flex;
   flex-direction: column;
+  font-family: var(--ff__bread01);
 }
 
 .nutri__container {
@@ -42,17 +60,40 @@ form {
   justify-content: space-between;
 }
 
+.caloriesLogged__container {
+  padding-bottom: 1em;
+}
+
 .foodItems__container {
   display: flex;
   flex-wrap: wrap;
+  max-width: 30em;
+  margin: 0 1em;
+  padding: 0 2em;
 }
 
 .foodItem {
-  margin: 1em;
+  width: 10em;
+  margin: 0 1em 1em;
+  cursor: pointer;
+  background-color: aquamarine;
+  border-radius: 10%;
+  padding: 0 1em 1em;
 }
 
 ul {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  list-style: inside none;
+}
+
+.foodItemLogs__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.deleteButton {
+  padding: 0 1em;
 }
