@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Food Tracker App</title>
+  </head>
+  <body>
+    <header><h1>Food Tracker</h1></header>
+    <main>
+      <section class="addFood__container">
+        <h2>Add food</h2>
+        <form>
+          <div class="foodTypes__container">
+            <label for="foodTypes">Food name:</label>
+            <select name="foodTypes" id="foodTypes">
+              <option value="Food Item" selected disabled hidden>
+                Select Food Type
+              </option>
+              <option value="Pizza">Pizza</option>
+              <option value="Soup">Soup</option>
+              <option value="Bread">Bread</option>
+            </select>
+          </div>
+          <div class="nutri__container">
+            <label for="carbs">Carbs:</label>
+            <input
+              type="number"
+              name="carbs"
+              id="carbs"
+              min="0"
+              placeholder="0g"
+            />
+          </div>
+          <div class="nutri__container">
+            <label for="protein">Protein:</label>
+            <input
+              type="number"
+              name="protein"
+              id="protein"
+              min="0"
+              placeholder="0g"
+            />
+          </div>
+          <div class="nutri__container">
+            <label for="fat">Fat:</label>
+            <input type="number" name="fat" id="fat" min="0" placeholder="0g" />
+          </div>
+          <button type="submit">Add</button>
+        </form>
+      </section>
+      <section class="stats__container">
+        <h2>Stats</h2>
+        <canvas id="doChart" width="500" height="200"></canvas>
+      </section>
+      <section class="log__container">
+        <h2>Log</h2>
+        <div class="caloriesLogged__container">
+          <p>
+            Total calories logged:
+            <span class="caloriesLogged">caloriesLogged</span>
+          </p>
+        </div>
+        <div class="foodItems__container"></div>
+      </section>
+    </main>
+    <footer></footer>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

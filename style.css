@@ -1,0 +1,58 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+}
+
+section {
+  padding: 0 1em 1em 1em;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid red;
+}
+
+h2 {
+  margin: 0.5em 0;
+}
+
+.foodTypes__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+select {
+  width: 60%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.nutri__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.foodItems__container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.foodItem {
+  margin: 1em;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
