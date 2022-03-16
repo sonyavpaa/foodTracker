@@ -10,6 +10,10 @@
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
+.snackbar {
+  font-family: var(--ff__head01);
+}
+
 body {
   display: flex;
   flex-direction: column;

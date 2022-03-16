@@ -15,11 +15,13 @@ let foodItemDivs = document.querySelectorAll(".foodItem");
 const deleteFoodItems = document.querySelector("#foodItemLogs");
 const deleteButton = document.querySelector(".deleteButton");
 // automated default numb for chart to keep it same sized
-const automatedNum = 20;
+const automatedNum = 10;
 
 const API = new FetchWrapper(
   "https://firestore.googleapis.com/v1/projects/programmingjs-90a13/databases/(default)/documents/"
 );
+
+ApiGet();
 
 // Submitting new foodItem
 form.addEventListener("submit", async (e) => {
@@ -31,6 +33,7 @@ form.addEventListener("submit", async (e) => {
 
   await addAPI(name, carbs, protein, fat);
   form.reset();
+  snackbar.show("New food item added!");
 });
 
 // Adding new food item to API
@@ -51,26 +54,28 @@ async function addAPI(nameValue, carbsValue, proteinValue, fatValue) {
         integerValue: fatValue,
       },
     },
-  }).then((data) => {
-    console.log(data);
   });
-  window.location.reload();
+  API.post("foodtracker", {});
+  ApiGet();
 }
 
 // getting the API and creating html content
-API.get("foodtracker2022").then((data) => {
-  let totalCaloriesCalc = 0;
-  if (data?.documents) {
-    data?.documents.forEach((item) => {
-      const nameUrl = item?.name.split("/")[6];
+function ApiGet() {
+  API.get("foodtracker2022").then((data) => {
+    let totalCaloriesCalc = 0;
+    foodItemsContainer.innerHTML = "";
+    deleteFoodItems.innerHTML = "";
+    if (data?.documents) {
+      data?.documents.forEach((item) => {
+        const nameUrl = item?.name.split("/")[6];
 
-      const name = item?.fields?.name?.stringValue;
-      const carbs = parseInt(item?.fields?.carbs?.integerValue);
-      const protein = parseInt(item?.fields?.protein?.integerValue);
-      const fat = parseInt(item?.fields?.fat?.integerValue);
-      totalCaloriesCalc += caloriesCalc(carbs, protein, fat);
+        const name = item?.fields?.name?.stringValue;
+        const carbs = parseInt(item?.fields?.carbs?.integerValue);
+        const protein = parseInt(item?.fields?.protein?.integerValue);
+        const fat = parseInt(item?.fields?.fat?.integerValue);
+        totalCaloriesCalc += caloriesCalc(carbs, protein, fat);
 
-      foodItemsContainer.innerHTML += `<div class="foodItem">
+        foodItemsContainer.innerHTML += `<div class="foodItem">
     <h2>${name}</h2>
     <p>Calories ${caloriesCalc(carbs, protein, fat)}</p>
     <ul class="foodItemNutritionList">
@@ -80,56 +85,55 @@ API.get("foodtracker2022").then((data) => {
     </ul>
   </div>`;
 
-      deleteFoodItems.innerHTML += `<option value="${nameUrl}">${name}</option>`;
-    });
-  }
+        deleteFoodItems.innerHTML += `<option value="${nameUrl}">${name}</option>`;
+      });
+    }
 
-  totalCalories.textContent = totalCaloriesCalc;
+    totalCalories.textContent = totalCaloriesCalc;
 
-  //   setting the latest one into chart
-  if (data?.documents) {
-    const charCarbs = parseInt(
-      data?.documents[data?.documents.length - 1]?.fields?.carbs?.integerValue
-    );
-    const charProtein = parseInt(
-      data?.documents[data?.documents.length - 1]?.fields?.protein?.integerValue
-    );
-    const charFat = parseInt(
-      data?.documents[data?.documents.length - 1]?.fields?.fat?.integerValue
-    );
-    doChart.config.data.datasets[0].data[0] = charCarbs;
-    doChart.config.data.datasets[0].data[1] = charProtein;
-    doChart.config.data.datasets[0].data[2] = charFat;
-    doChart.config.data.datasets[0].data[3] = automatedNum;
-    doChart.update();
-  }
-
-  //   adding event listeners to foodItems in DOM
-  foodItemDivs = document.querySelectorAll(".foodItem").forEach((item) =>
-    item.addEventListener("click", (e) => {
-      // carbs
-      const carbs = parseInt(
-        e.currentTarget.children[2].children[0].innerText.split(" ")[1]
+    //   setting info to the charts.js
+    if (data?.documents) {
+      const charCarbs = parseInt(
+        data?.documents[0]?.fields?.carbs?.integerValue
       );
-
-      //   protein
-      const protein = parseInt(
-        e.currentTarget.children[2].children[1].innerText.split(" ")[1]
+      const charProtein = parseInt(
+        data?.documents[0]?.fields?.protein?.integerValue
       );
-
-      //   fat
-      const fat = parseInt(
-        e.currentTarget.children[2].children[2].innerText.split(" ")[1]
-      );
-
-      doChart.config.data.datasets[0].data[0] = carbs;
-      doChart.config.data.datasets[0].data[1] = protein;
-      doChart.config.data.datasets[0].data[2] = fat;
+      const charFat = parseInt(data?.documents[0]?.fields?.fat?.integerValue);
+      doChart.config.data.datasets[0].data[0] = charCarbs;
+      doChart.config.data.datasets[0].data[1] = charProtein;
+      doChart.config.data.datasets[0].data[2] = charFat;
       doChart.config.data.datasets[0].data[3] = automatedNum;
       doChart.update();
-    })
-  );
-});
+    }
+
+    //   adding event listeners to foodItems in DOM
+    foodItemDivs = document.querySelectorAll(".foodItem").forEach((item) =>
+      item.addEventListener("click", (e) => {
+        // carbs
+        const carbs = parseInt(
+          e.currentTarget.children[2].children[0].innerText.split(" ")[1]
+        );
+
+        //   protein
+        const protein = parseInt(
+          e.currentTarget.children[2].children[1].innerText.split(" ")[1]
+        );
+
+        //   fat
+        const fat = parseInt(
+          e.currentTarget.children[2].children[2].innerText.split(" ")[1]
+        );
+
+        doChart.config.data.datasets[0].data[0] = carbs;
+        doChart.config.data.datasets[0].data[1] = protein;
+        doChart.config.data.datasets[0].data[2] = fat;
+        doChart.config.data.datasets[0].data[3] = automatedNum;
+        doChart.update();
+      })
+    );
+  });
+}
 
 // Calculating calories
 const caloriesCalc = (carbs, protein, fat) => {
@@ -180,10 +184,7 @@ const doChart = new Chart(document.querySelector("#doChart"), config);
 
 // delete
 deleteButton.addEventListener("click", async (e) => {
-  console.log(deleteFoodItems.value);
-
-  await API.delete(`foodtracker2022/${deleteFoodItems.value}`).then((data) =>
-    console.log(data)
-  );
-  window.location.reload();
+  await API.delete(`foodtracker2022/${deleteFoodItems.value}`);
+  ApiGet();
+  snackbar.show("Food item deleted!");
 });
